@@ -1,5 +1,6 @@
 package com.syftapp.codetest.posts
 
+import androidx.paging.PagingData
 import com.syftapp.codetest.data.model.domain.Post
 import com.syftapp.codetest.rules.RxSchedulerRule
 import io.mockk.MockKAnnotations
@@ -7,7 +8,7 @@ import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.impl.annotations.RelaxedMockK
 import io.mockk.verifyOrder
-import io.reactivex.Single
+import io.reactivex.Flowable
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -33,7 +34,7 @@ class PostsPresenterTest {
 
     @Test
     fun `binding loads posts`() {
-        every { getPostsUseCase.execute() } returns Single.just(listOf(anyPost))
+        every { getPostsUseCase.execute() } returns Flowable.just(PagingData.from(listOf(anyPost)))
 
         sut.bind(view)
 
@@ -46,7 +47,7 @@ class PostsPresenterTest {
 
     @Test
     fun `error on binding shows error state after loading`() {
-        every { getPostsUseCase.execute() } returns Single.error(Throwable())
+        every { getPostsUseCase.execute() } returns Flowable.error(Throwable())
 
         sut.bind(view)
 
