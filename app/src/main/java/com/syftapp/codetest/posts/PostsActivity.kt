@@ -3,6 +3,7 @@ package com.syftapp.codetest.posts
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.syftapp.codetest.Navigation
@@ -59,12 +60,13 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
         binding.loading.visibility = View.GONE
     }
 
-    private fun showPosts(posts: List<Post>) {
+    private fun showPosts(posts: PagingData<Post>) {
         // this is a fairly crude implementation, if it was Flowable, it would
         // be better to use DiffUtil and consider notifyRangeChanged, notifyItemInserted, etc
         // to preserve animations on the RecyclerView
-        adapter = PostsAdapter(posts, presenter)
+        adapter = PostsAdapter(presenter)
         binding.listOfPosts.adapter = adapter
+        adapter.submitData(lifecycle, posts)
         binding.listOfPosts.visibility = View.VISIBLE
     }
 

@@ -2,14 +2,16 @@ package com.syftapp.codetest.posts
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
+import androidx.paging.rxjava2.RxPagingSource
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.syftapp.codetest.data.model.domain.Post
 import com.syftapp.codetest.databinding.ViewPostListItemBinding
 
 class PostsAdapter(
-    private val data: List<Post>,
     private val presenter: PostsPresenter
-) : RecyclerView.Adapter<PostViewHolder>() {
+) : PagingDataAdapter<Post, PostViewHolder>(POSTS_COMPARATOR) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -18,12 +20,23 @@ class PostsAdapter(
         return PostViewHolder(binding, presenter)
     }
 
-    override fun getItemCount(): Int {
-        return data.size
+    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
+        getItem(position)?.let {
+            holder.bind(it)
+        }
     }
 
-    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
-        holder.bind(data[position])
+    companion object {
+        private val POSTS_COMPARATOR = object : DiffUtil.ItemCallback<Post>() {
+            override fun areItemsTheSame(oldItem: Post, newItem: Post): Boolean {
+                return oldItem.id == newItem.id
+            }
+
+            override fun areContentsTheSame(oldItem: Post, newItem: Post): Boolean {
+                return oldItem.title == newItem.title && oldItem.body == newItem.body
+            }
+
+        }
     }
 }
 
