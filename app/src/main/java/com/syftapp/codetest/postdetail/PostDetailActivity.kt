@@ -8,17 +8,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.syftapp.codetest.R
 import com.syftapp.codetest.data.model.domain.Post
-import kotlinx.android.synthetic.main.activity_post_details.*
+import com.syftapp.codetest.databinding.ActivityPostDetailsBinding
 import org.koin.android.ext.android.inject
 import org.koin.core.KoinComponent
 
 class PostDetailActivity : AppCompatActivity(), PostDetailView, KoinComponent {
 
     private val presenter: PostDetailPresenter by inject()
+    private lateinit var binding: ActivityPostDetailsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_post_details)
+        binding = ActivityPostDetailsBinding.inflate(layoutInflater)
+
+        setContentView(binding.root)
 
         val postId = intent?.extras?.getInt(ARG_POST_ID, -1)
         if (postId == null || postId == -1) {
@@ -47,30 +50,30 @@ class PostDetailActivity : AppCompatActivity(), PostDetailView, KoinComponent {
     }
 
     private fun hideLoading() {
-        loading.visibility = View.GONE
+        binding.loading.visibility = View.GONE
     }
 
     private fun showPost(post: Post) {
         with(View.VISIBLE) {
-            postTitle.visibility = this
-            postBody.visibility = this
+            binding.postTitle.visibility = this
+            binding.postBody.visibility = this
 
             // TODO add comments
         }
 
-        postTitle.text = post.title
-        postBody.text = post.body
+        binding.postTitle.text = post.title
+        binding.postBody.text = post.body
     }
 
     private fun showLoading() {
         with(View.GONE) {
-            error.visibility = this
+            binding.error.visibility = this
 
-            postTitle.visibility = this
-            postBody.visibility = this
+            binding.postTitle.visibility = this
+            binding.postBody.visibility = this
         }
 
-        loading.visibility = View.VISIBLE
+        binding.loading.visibility = View.VISIBLE
     }
 
     companion object {
