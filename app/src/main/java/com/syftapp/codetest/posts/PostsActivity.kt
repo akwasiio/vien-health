@@ -64,12 +64,15 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
 
     private fun initAdapter() {
         adapter = PostsAdapter(presenter)
-        binding.listOfPosts.adapter = adapter
+        binding.listOfPosts.adapter = adapter.withLoadStateFooter(PostsLoadStateAdapter())
+
 
         adapter.addLoadStateListener { loadStates ->
             binding.loading.visibility = if(loadStates.refresh is LoadState.Loading) View.VISIBLE else View.GONE
             binding.error.visibility = if(loadStates.refresh is LoadState.Error) View.VISIBLE else View.GONE
         }
+
+
     }
 
     private fun showPosts(posts: PagingData<Post>) {

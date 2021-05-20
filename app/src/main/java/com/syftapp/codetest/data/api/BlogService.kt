@@ -17,7 +17,7 @@ interface BlogService {
     fun getComments(): Single<List<Comment>>
 
     @GET("/posts")
-    fun getPosts(@Query("_page")page: Int, @Query("_limit")limit: Int = 10): Single<List<Post>>
+    fun getPosts(@Query("_page")page: Int, @Query("_limit")limit: Int = 5): Single<List<Post>>
 
     companion object {
         fun createService(retrofit: Retrofit) = retrofit.create(BlogService::class.java)

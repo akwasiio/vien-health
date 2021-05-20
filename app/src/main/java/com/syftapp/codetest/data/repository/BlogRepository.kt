@@ -49,7 +49,7 @@ class BlogRepository(
     @OptIn(ExperimentalPagingApi::class)
     override fun getPosts(): Flowable<PagingData<Post>> {
         return Pager(
-            config = PagingConfig(pageSize = 10, enablePlaceholders = false, prefetchDistance = 10),
+            config = PagingConfig(pageSize = 10, enablePlaceholders = false, prefetchDistance = 5),
             remoteMediator = PostsRemoteMediator(blogApi, appDatabase, postDao, postKeyDao)
         ) {
             postDao.getPostsPaged()
