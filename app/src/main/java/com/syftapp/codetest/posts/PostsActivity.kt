@@ -3,6 +3,7 @@ package com.syftapp.codetest.posts
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -32,6 +33,7 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
         val separator = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         binding.listOfPosts.addItemDecoration(separator)
 
+        initAdapter()
         presenter.bind(this)
     }
 
@@ -60,12 +62,20 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
         binding.loading.visibility = View.GONE
     }
 
+    private fun initAdapter() {
+        adapter = PostsAdapter(presenter)
+        binding.listOfPosts.adapter = adapter
+
+        adapter.addLoadStateListener { loadStates ->
+            binding.loading.visibility = if(loadStates.refresh is LoadState.Loading) View.VISIBLE else View.GONE
+            binding.error.visibility = if(loadStates.refresh is LoadState.Error) View.VISIBLE else View.GONE
+        }
+    }
+
     private fun showPosts(posts: PagingData<Post>) {
         // this is a fairly crude implementation, if it was Flowable, it would
         // be better to use DiffUtil and consider notifyRangeChanged, notifyItemInserted, etc
         // to preserve animations on the RecyclerView
-        adapter = PostsAdapter(presenter)
-        binding.listOfPosts.adapter = adapter
         adapter.submitData(lifecycle, posts)
         binding.listOfPosts.visibility = View.VISIBLE
     }
