@@ -17,6 +17,7 @@ interface BlogDataProvider {
 
 }
 
+// interface for the Blog repository
 interface BlogProvider {
     fun getUsers(): Single<List<User>>
 

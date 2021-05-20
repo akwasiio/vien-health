@@ -5,8 +5,6 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.rxjava2.RxRemoteMediator
 import com.syftapp.codetest.data.api.BlogApi
-import com.syftapp.codetest.data.dao.PostDao
-import com.syftapp.codetest.data.dao.PostKeyDao
 import com.syftapp.codetest.data.database.AppDatabase
 import com.syftapp.codetest.data.model.domain.Post
 import com.syftapp.codetest.data.model.domain.PostKey
@@ -18,8 +16,6 @@ import java.io.InvalidObjectException
 class PostsRemoteMediator(
     private val blogApi: BlogApi,
     private val appDatabase: AppDatabase,
-    private val postDao: PostDao,
-    private val postKeyDao: PostKeyDao,
 ) : RxRemoteMediator<Int, Post>() {
 
     @OptIn(ExperimentalPagingApi::class)
@@ -56,9 +52,9 @@ class PostsRemoteMediator(
                     blogApi.getPosts(page).subscribeOn(Schedulers.io()).map { posts ->
                         appDatabase.runInTransaction {
                             if (loadType == LoadType.REFRESH) {
-                                postKeyDao.clearKeys()
+                                appDatabase.postKeyDao().clearKeys()
                                 // clear posts
-                                postDao.deletePosts()
+                                appDatabase.postDao().deletePosts()
                             }
 
                             val prevKey = if (page == 1) null else page - 1
@@ -69,8 +65,8 @@ class PostsRemoteMediator(
                             }
 
 
-                            postKeyDao.insertAll(keys)
-                            postDao.insertAll(posts)
+                            appDatabase.postKeyDao().insertAll(keys)
+                            appDatabase.postDao().insertAll(posts)
                         }
 
                         return@map MediatorResult.Success(posts.isEmpty())
@@ -81,7 +77,7 @@ class PostsRemoteMediator(
 
     private fun getPostKeyForLastItem(state: PagingState<Int, Post>): PostKey? {
         return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data?.lastOrNull()?.let { post ->
-            postKeyDao.postKeysById(post.id.toLong())
+            appDatabase.postKeyDao().postKeysById(post.id.toLong())
         }
     }
 
@@ -91,7 +87,7 @@ class PostsRemoteMediator(
         return state.pages.firstOrNull { it.data.isNotEmpty() }?.data?.firstOrNull()
             ?.let { post ->
                 // Get the remote keys of the first items retrieved
-                postKeyDao.postKeysById(post.id.toLong())
+                appDatabase.postKeyDao().postKeysById(post.id.toLong())
             }
     }
 
@@ -102,7 +98,7 @@ class PostsRemoteMediator(
         // Get the item closest to the anchor position
         return state.anchorPosition?.let { position ->
             state.closestItemToPosition(position)?.id?.let { postId ->
-                return postKeyDao.postKeysById(postId.toLong())
+                return appDatabase.postKeyDao().postKeysById(postId.toLong())
             }
         }
     }

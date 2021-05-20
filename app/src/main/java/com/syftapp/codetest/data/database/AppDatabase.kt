@@ -36,7 +36,6 @@ abstract class AppDatabase : RoomDatabase() {
             return synchronized(syncLock) {
                 instance ?:
                 Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
-                    .allowMainThreadQueries()
                     .build()
                     .also { instance = it }
             }

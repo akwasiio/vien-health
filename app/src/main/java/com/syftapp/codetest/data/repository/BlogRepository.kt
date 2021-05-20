@@ -22,27 +22,23 @@ import io.reactivex.schedulers.Schedulers
 import org.koin.core.KoinComponent
 
 class BlogRepository(
-    private val postDao: PostDao,
-    private val commentDao: CommentDao,
-    private val userDao: UserDao,
-    private val postKeyDao: PostKeyDao,
     private val blogApi: BlogApi,
     private val appDatabase: AppDatabase
 ) : KoinComponent, BlogProvider {
 
     override fun getUsers(): Single<List<User>> {
         return fetchData(
-            local = { userDao.getAll() },
+            local = { appDatabase.userDao().getAll() },
             remote = { blogApi.getUsers() },
-            insert = { value -> userDao.insertAll(*value.toTypedArray()) }
+            insert = { value -> appDatabase.userDao().insertAll(*value.toTypedArray()) }
         )
     }
 
     override fun getComments(): Single<List<Comment>> {
         return fetchData(
-            local = { commentDao.getAll() },
+            local = { appDatabase.commentDao().getAll() },
             remote = { blogApi.getComments() },
-            insert = { value -> commentDao.insertAll(*value.toTypedArray()) }
+            insert = { value -> appDatabase.commentDao().insertAll(*value.toTypedArray()) }
         )
     }
 
@@ -50,14 +46,14 @@ class BlogRepository(
     override fun getPosts(): Flowable<PagingData<Post>> {
         return Pager(
             config = PagingConfig(pageSize = 10, enablePlaceholders = false, prefetchDistance = 5),
-            remoteMediator = PostsRemoteMediator(blogApi, appDatabase, postDao, postKeyDao)
+            remoteMediator = PostsRemoteMediator(blogApi, appDatabase)
         ) {
-            postDao.getPostsPaged()
+            appDatabase.postDao().getPostsPaged()
         }.flowable.subscribeOn(Schedulers.io())
     }
 
     fun getPost(postId: Int): Maybe<Post> {
-        return postDao.get(postId)
+        return appDatabase.postDao().get(postId)
     }
 
     private fun <T> fetchData(
