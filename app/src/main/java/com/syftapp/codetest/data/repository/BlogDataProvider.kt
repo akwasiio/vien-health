@@ -13,7 +13,7 @@ interface BlogDataProvider {
 
     fun getComments(): Single<List<Comment>>
 
-    fun getPosts(): Single<List<Post>>
+    fun getPosts(page: Int): Single<List<Post>>
 
 }
 
