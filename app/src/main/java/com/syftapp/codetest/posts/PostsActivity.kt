@@ -44,7 +44,8 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
 
     override fun render(state: PostScreenState) {
         when (state) {
-            is PostScreenState.Loading -> showLoading()
+            is PostScreenState.Loading -> {
+            }
             is PostScreenState.DataAvailable -> showPosts(state.posts)
             is PostScreenState.Error -> showError(getString(R.string.load_posts_error_message))
             is PostScreenState.FinishedLoading -> hideLoading()
@@ -68,8 +69,10 @@ class PostsActivity : AppCompatActivity(), PostsView, KoinComponent {
 
 
         adapter.addLoadStateListener { loadStates ->
-            binding.loading.visibility = if(loadStates.refresh is LoadState.Loading) View.VISIBLE else View.GONE
-            binding.error.visibility = if(loadStates.refresh is LoadState.Error) View.VISIBLE else View.GONE
+            binding.loading.visibility =
+                if (loadStates.refresh is LoadState.Loading && adapter.itemCount == 0) View.VISIBLE else View.GONE
+            binding.error.visibility =
+                if (loadStates.refresh is LoadState.Error) View.VISIBLE else View.GONE
         }
 
 
